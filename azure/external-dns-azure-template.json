@@ -1,0 +1,7 @@
+{
+    "tenantId": "${AKS_TENANT_ID}",
+    "subscriptionId": "${AKS_SUBSCRIPTION_ID}",
+    "resourceGroup": "${AKS_RESOURCE_GROUP}",
+    "useManagedIdentityExtension": true,
+    "userAssignedIdentityID": "${K8S_AZURE_DNS_ZONE_POD_IDENTITY_ID}"
+}

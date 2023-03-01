@@ -1,0 +1,71 @@
+# external-dns-deployment-pod-identity.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: external-dns
+  labels:
+    app: external-dns
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: external-dns
+  labels:
+    app: external-dns
+rules:
+  - apiGroups: [""]
+    resources: ["services","endpoints","pods", "nodes"]
+    verbs: ["get","watch","list"]
+  - apiGroups: ["extensions","networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get","watch","list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: external-dns-viewer
+  labels:
+    app: external-dns
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: external-dns
+subjects:
+  - kind: ServiceAccount
+    name: external-dns
+    namespace: ${K8S_EXTDNS_NAMESPACE}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: external-dns
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: external-dns
+  template:
+    metadata:
+      labels:
+        app: external-dns
+    spec:
+      serviceAccountName: external-dns
+      containers:
+        - name: external-dns
+          image: registry.k8s.io/external-dns/external-dns:v0.13.2
+          args:
+            - --source=service
+            - --source=ingress
+            - --domain-filter=${DOMAIN_NAME}
+            - --provider=azure
+            - --azure-resource-group=${AKS_RESOURCE_GROUP}
+            - --txt-prefix=externaldns-
+          volumeMounts:
+            - name: volume-for-azure-pod-identity
+              mountPath: /etc/kubernetes
+              readOnly: true
+      volumes:
+        - name: volume-for-azure-pod-identity
+          secret:
+            secretName: ${K8S_AZURE_DNS_ZONE_POD_IDENTITY_SECRET_NAME}

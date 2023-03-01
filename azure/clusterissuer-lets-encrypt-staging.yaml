@@ -1,0 +1,20 @@
+# clusterissuer-lets-encrypt-staging.yaml
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: ${K8S_CM_LETENCRYPT_EMAIL_ADDRESS}
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    solvers:
+    - dns01:
+        azureDNS:
+          resourceGroupName: ${AKS_RESOURCE_GROUP}
+          subscriptionID: ${AKS_SUBSCRIPTION_ID}
+          hostedZoneName: ${DOMAIN_NAME}
+          environment: AzurePublicCloud
+          managedIdentity:
+            clientID: ${K8S_CM_MANAGED_IDENTITY_ID}

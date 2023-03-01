@@ -1,0 +1,49 @@
+# wowza-linux-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wse-linux
+  labels:
+    app: wse-linux
+spec:
+  selector:
+    matchLabels:
+      app: wse-linux-pod
+  template:
+    metadata:
+      labels:
+        app: wse-linux-pod
+    spec:
+      containers:
+      - name: wse-linux-app
+        image: ghcr.io/liveinstantly/wowza-streaming-engine-ubuntu:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 443
+        - containerPort: 1935
+        - containerPort: 8086
+        - containerPort: 8087
+        - containerPort: 8090
+        volumeMounts:
+        - name: cert-volume-for-engine
+          mountPath: /etc/cert-engine
+          readOnly: true
+        - name: cert-volume-for-manager
+          mountPath: /etc/cert-manager
+          readOnly: true
+        env:
+        - name: WSE_MGR_USER
+          value: "wseadmin"
+        - name: WSE_MGR_PASS
+          value: "WowzaP@ssw0rd!"
+        - name: WSE_TLS_CERT
+          value: /etc/cert-engine
+        - name: WSE_MGR_TLS_CERT
+          value: /etc/cert-manager
+      volumes:
+      - name: cert-volume-for-engine
+        secret:
+          secretName: cert-secret-wildcard-domain
+      - name: cert-volume-for-manager
+        secret:
+          secretName: cert-secret-wildcard-domain

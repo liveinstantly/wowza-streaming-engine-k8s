@@ -1,0 +1,17 @@
+# wowza-manager-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+    name: wowza-manager-service
+    annotations:
+        service.beta.kubernetes.io/azure-dns-label-name: ${WSE_MANAGER_LB_DNS_NAME}
+        external-dns.alpha.kubernetes.io/hostname: ${WSE_MANAGER_LB_DNS_NAME}.${DOMAIN_NAME}.
+spec:
+    ports:
+    - port: 8090
+      name: manager
+      protocol: TCP
+      targetPort: 8090
+    selector:
+        app: wse-linux-pod
+    type: LoadBalancer

@@ -1,0 +1,29 @@
+# wowza-streaming-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+    name: wowza-streaming-service
+    annotations:
+        service.beta.kubernetes.io/azure-dns-label-name: ${WSE_STREAMING_LB_DNS_NAME}
+        external-dns.alpha.kubernetes.io/hostname: ${WSE_STREAMING_LB_DNS_NAME}.${DOMAIN_NAME}.
+spec:
+    ports:
+    - port: 443
+      name: streaming-https
+      protocol: TCP
+      targetPort: 443
+    - port: 1935
+      name: streaming-http
+      protocol: TCP
+      targetPort: 1935
+    - port: 8086
+      name: admin
+      protocol: TCP
+      targetPort: 8086
+    - port: 8087
+      name: rest-api
+      protocol: TCP
+      targetPort: 8087
+    selector:
+        app: wse-linux-pod
+    type: LoadBalancer
