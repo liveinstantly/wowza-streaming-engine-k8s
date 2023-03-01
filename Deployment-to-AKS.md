@@ -128,7 +128,7 @@ You can create your sub domain in Azure DNS zone with the following command:
 <somewhere>/wowza-streaming-engine-k8s/azure$ ./create_aks_domain_zone.sh
 ```
 
-The output of the command contains `nameServer` information of Azure DNS as below, and you will need to delegate the sub domain to Azure DNS by adding a NS record for this sub domain name in your domain registrar and pointing the Azure DNS servers for your sub domain name.
+The output of the command contains `nameServer` information of Azure DNS as below. You will need to delegate the sub domain to Azure DNS by adding a NS record for this sub domain name in your domain registrar and pointing the Azure DNS servers for your sub domain name.
 
 ```json
 {
@@ -143,6 +143,9 @@ The output of the command contains `nameServer` information of Azure DNS as belo
     ...
 }
 ```
+
+DNS sub domain configuration in your domain registrar is to add a NS record like below:
+![DNS sub domain configuration at your domain registrar](./images/screenshot_dns_ns_at_domain_registrar.png)
 
 Once you have configured delegation for your sub domain, you can verify the name resolution with the following command:
 
